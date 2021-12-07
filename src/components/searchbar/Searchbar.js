@@ -1,8 +1,9 @@
 import "./Searchbar.css";
 import Table from "../results-table/Table.js";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import epRange from "./epRange.js";
 import data from "../../lines.json";
+import Axios from "axios";
 
 export default function Searchbar() {
   const [project, setProject] = useState("");
@@ -11,6 +12,23 @@ export default function Searchbar() {
   const [line, setLine] = useState("");
 
   const [result, setResult] = useState([]);
+  
+  const URL = `http://192.168.0.201:8081/api`;
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        await Axios.get(URL).then(response => {
+           console.log("happy",response.data)
+         })
+      } catch(err) {
+        console.error(err)
+      }
+     
+    }
+    getData();
+  }, [])
+  
 
   // data search from form input
 
@@ -26,7 +44,6 @@ export default function Searchbar() {
           const epSearched = episodes.map((ep) => {
             return characterSearched.filter(
               (result) =>
-                result.episode.includes(episode) &&
                 result.episode === ep &&
                 result.line.toLowerCase().includes(line.toLowerCase()) &&
                 result.project.toLowerCase().includes(project.toLowerCase())

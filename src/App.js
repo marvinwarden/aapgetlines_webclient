@@ -1,6 +1,8 @@
 import "./styles.css";
 import Searchbar from "./components/searchbar/Searchbar";
 import "./App.css";
+import React from 'react';
+
 export default function App() {
   return (
     <div className="App">
