@@ -5,9 +5,9 @@ export default function epRange(episodeRange) {
   if (episodes.length > 1) {
   for (let i = parseInt(episodes[0]); i <= parseInt(episodes[1]); i++) {
     if (i < 10) {
-      range.push("0" + i.toString());
+      range.push("0" + i.toString() + ",");
     } else {
-      range.push(i.toString());
+      range.push(i.toString() + ",");
     }
   }
   } else {

@@ -3,6 +3,7 @@ import Table from "../results-table/Table.js";
 import React, { useState, useEffect } from "react";
 import epRange from "./epRange.js";
 import data from "../../lines.json";
+import queryUrl from "../../utils/query-url.js";
 import Axios from "axios";
 
 export default function Searchbar() {
@@ -10,10 +11,13 @@ export default function Searchbar() {
   const [character, setCharacter] = useState("");
   const [episode, setEpisode] = useState("");
   const [line, setLine] = useState("");
+  const [page, setPage] = useState("");
 
   const [result, setResult] = useState([]);
-  
-  const URL = `http://192.168.0.201:8081/api`;
+
+  const URL = queryUrl(project, character, episode, line, page)
+
+  // Get payload from database
 
   useEffect(() => {
     const getData = async () => {
@@ -26,8 +30,9 @@ export default function Searchbar() {
       }
      
     }
+    console.log(URL)
     getData();
-  }, [])
+  })
   
 
   // data search from form input
