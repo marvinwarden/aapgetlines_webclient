@@ -1,29 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Table.css";
 import TableData from "./TableData";
 import { TableCell, TablePagination, TableRow } from "@mui/material";
+import usePagination from "./usePagination"
+import queryString from "../../utils/query-url"
 
-export default function Table({ searchResult }) {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+export default function Table({ searchResult, project, character, episode, line }) {
+  
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, emptyRows } = usePagination(searchResult);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const search = searchResult.map((result) => {
+    return result.length;
+  });
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const emptyRows =
-    rowsPerPage -
-    Math.min(
-      rowsPerPage,
-      searchResult.map((result) => result.length) - page * rowsPerPage
-    );
-
-  // const useStyles
+  const query = search.reduce(function (prevValue, currentValue) { return prevValue + currentValue }, 0);
+  
+  const URL = queryString(project, character, episode, line, page);
 
   return (
     <div className="table">
@@ -60,11 +52,11 @@ export default function Table({ searchResult }) {
       </table>
       {searchResult.length > 0 && (
         <TablePagination
+          //ADD AXIOS GET REQUEST TO ONCLICK
+          onClick={console.log("new url", URL)}
           rowsPerPageOptions={[5, 10, 15]}
           component="div"
-          count={searchResult.map((result) => {
-            return result.length;
-          })}
+          count={query}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}

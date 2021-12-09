@@ -1,39 +1,25 @@
 import "./Searchbar.css";
 import Table from "../results-table/Table.js";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import epRange from "./epRange.js";
 import data from "../../lines.json";
-import queryUrl from "../../utils/query-url.js";
-import Axios from "axios";
+import usePagination from "../results-table/usePagination";
+import queryString from "../../utils/query-url";
 
 export default function Searchbar() {
   const [project, setProject] = useState("");
   const [character, setCharacter] = useState("");
   const [episode, setEpisode] = useState("");
   const [line, setLine] = useState("");
-  const [page, setPage] = useState("");
-
   const [result, setResult] = useState([]);
 
-  const URL = queryUrl(project, character, episode, line, page)
+  const { page } = usePagination(result);
 
-  // Get payload from database
+  const URL = queryString(project, character, episode, line, page)
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        await Axios.get(URL).then(response => {
-           console.log("happy",response.data)
-         })
-      } catch(err) {
-        console.error(err)
-      }
-     
-    }
-    console.log(URL)
-    getData();
-  })
   
+
+  //ADD AXIOS GET REQUEST TO ONCLICK
 
   // data search from form input
 
@@ -49,6 +35,7 @@ export default function Searchbar() {
           const epSearched = episodes.map((ep) => {
             return characterSearched.filter(
               (result) =>
+                result.episode.includes(ep) &&
                 result.episode === ep &&
                 result.line.toLowerCase().includes(line.toLowerCase()) &&
                 result.project.toLowerCase().includes(project.toLowerCase())
@@ -75,11 +62,14 @@ export default function Searchbar() {
     e.preventDefault();
   };
 
+  useEffect(() => {
+    console.log("flex", URL);
+  }, [URL]);
+
   //clear search
 
   const clearSearch = (e) => {
     setResult([]);
-
     setCharacter("");
     setProject("");
     setLine("");
@@ -143,7 +133,7 @@ export default function Searchbar() {
         </div>
       </div>
 
-      <Table searchResult={result} />
+      <Table searchResult={result} project={project} character={character} episode={episode} line={line} />
     </div>
   );
 }
