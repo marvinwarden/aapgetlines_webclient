@@ -1,10 +1,12 @@
 import "./Searchbar.css";
 import Table from "../results-table/Table.js";
 import React, { useEffect, useState } from "react";
-import epRange from "./epRange.js";
+import { epRangesToSequences } from "./epRange.js";
 import data from "../../lines.json";
 import usePagination from "../results-table/usePagination";
-import queryString from "../../utils/query-url";
+import buildQueryString from "../../utils/query-url";
+import '../../http/apiClient';
+import { api } from "../../http/apiClient";
 
 export default function Searchbar() {
   const [project, setProject] = useState("");
@@ -12,71 +14,76 @@ export default function Searchbar() {
   const [episode, setEpisode] = useState("");
   const [line, setLine] = useState("");
   const [result, setResult] = useState([]);
-
-  const { page } = usePagination(result);
-
-  const URL = queryString(project, character, episode, line, page)
-
   
-
-  //ADD AXIOS GET REQUEST TO ONCLICK
-
+  const { page } = usePagination(result);
+  
   // data search from form input
+  const lineSearch = async (e) => {
+    e.preventDefault();
 
-  const lineSearch = (e) => {
-    const characterSearched = data.filter((result) =>
-      result.character.toLowerCase().includes(character.toLowerCase())
-    );
+    // TODO: Validate that at least one option was provided by user
 
-    if (character !== "" && project !== "") {
-      if (episode !== "" || line !== "") {
-        if (episode !== "") {
-          const episodes = epRange(episode);
-          const epSearched = episodes.map((ep) => {
-            return characterSearched.filter(
-              (result) =>
-                result.episode.includes(ep) &&
-                result.episode === ep &&
-                result.line.toLowerCase().includes(line.toLowerCase()) &&
-                result.project.toLowerCase().includes(project.toLowerCase())
-            );
-          });
-          e.preventDefault();
-          console.log("test", epSearched);
-          return setResult(epSearched);
-        }
+    // Storage for parsed user input
+    let list_projects = [];
+    let list_episodes = [];
+    let list_characters = [];
+    let list_lines = [];
+    
+    // Collect user input from form fields
+    const user_input = [
+      {project,   data: list_projects   },
+      {episode,   data: list_episodes   },
+      {character, data: list_characters },
+      {line,      data: list_lines      }
+    ]
 
-        const lineSearched = characterSearched.filter((result) =>
-          result.line.toLowerCase().includes(line.toLowerCase())
-        );
-        e.preventDefault();
-        return setResult([lineSearched]);
+    // Parse and seperate user options
+    for (const i of user_input) {
+      const k = Object.keys(i)[0];
+      let delimiter = '';
+      if (k === 'episode' || k === 'character') {
+        delimiter = ',';
+      } else if (k === 'project' || k === 'line') {
+        delimiter = '&&';
       }
 
-      const projectSearched = characterSearched.filter((result) =>
-        result.project.toLowerCase().includes(project.toLowerCase())
-      );
-      setResult([projectSearched]);
+      const dirty_data = i[k].split(delimiter);
+      for (const n of dirty_data) {
+        i['data'].push(n.trim().toLowerCase());
+      }
     }
 
-    e.preventDefault();
+    // Transform ranged episodes to a sequence of comma-seperated values
+    const eps_sequence = epRangesToSequences(list_episodes);
+
+    // Build the URL based on user inputs
+    const qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines);
+
+    // Make query to the API
+    try {
+      const qry_response = await api.get(qry_href);
+      // TODO: Set results in UI
+    } catch (e) {
+      // TODO: handle failed query in UI
+      console.error(`[ERROR] query to API failed with message: ${e}`);
+    }
+
   };
 
-  useEffect(() => {
-    console.log("flex", URL);
-  }, [URL]);
+  useEffect(() => { return; });
 
   //clear search
 
   const clearSearch = (e) => {
+    e.preventDefault();
     setResult([]);
     setCharacter("");
     setProject("");
     setLine("");
     setEpisode("");
-    e.preventDefault();
   };
 
+// TODO: implement input tokenization for user input during search query
   return (
     <div className="search-bar">
       <div className="search-section">
@@ -106,7 +113,7 @@ export default function Searchbar() {
                     <input
                       type="text"
                       onChange={(e) =>
-                        setEpisode(e.target.value.replace(" ", ""))
+                        setEpisode(e.target.value)
                       }
                       className="search-input"
                       value={episode}

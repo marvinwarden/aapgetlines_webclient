@@ -2,6 +2,7 @@ import "./styles.css";
 import Searchbar from "./components/searchbar/Searchbar";
 import "./App.css";
 import React from 'react';
+import { api } from './http/apiClient';
 
 export default function App() {
   return (

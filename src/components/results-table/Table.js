@@ -3,7 +3,7 @@ import "./Table.css";
 import TableData from "./TableData";
 import { TableCell, TablePagination, TableRow } from "@mui/material";
 import usePagination from "./usePagination"
-import queryString from "../../utils/query-url"
+import buildQueryString from "../../utils/query-url"
 
 export default function Table({ searchResult, project, character, episode, line }) {
   
@@ -14,8 +14,6 @@ export default function Table({ searchResult, project, character, episode, line 
   });
 
   const query = search.reduce(function (prevValue, currentValue) { return prevValue + currentValue }, 0);
-  
-  const URL = queryString(project, character, episode, line, page);
 
   return (
     <div className="table">
@@ -53,7 +51,7 @@ export default function Table({ searchResult, project, character, episode, line 
       {searchResult.length > 0 && (
         <TablePagination
           //ADD AXIOS GET REQUEST TO ONCLICK
-          onClick={console.log("new url", URL)}
+          onClick=''
           rowsPerPageOptions={[5, 10, 15]}
           component="div"
           count={query}
