@@ -2,7 +2,6 @@ import "./Searchbar.css";
 import Table from "../results-table/Table.js";
 import React, { useEffect, useState } from "react";
 import { epRangesToSequences } from "./epRange.js";
-import data from "../../lines.json";
 import usePagination from "../results-table/usePagination";
 import buildQueryString from "../../utils/query-url";
 import '../../http/apiClient';
@@ -41,10 +40,17 @@ export default function Searchbar() {
     for (const i of user_input) {
       const k = Object.keys(i)[0];
       let delimiter = '';
+
       if (k === 'episode' || k === 'character') {
-        delimiter = ',';
+        // Handle case wher user uses | as delimiter
+        // TODO: Use better procedure for testing which delimiter is being used
+        const re_delimiter = new RegExp('|');
+
+        if (re_delimiter.test(i[k])) delimiter = '|';
+        else delimiter = ',';
+
       } else if (k === 'project' || k === 'line') {
-        delimiter = '&&';
+        delimiter = '|';
       }
 
       const dirty_data = i[k].split(delimiter);
@@ -62,7 +68,11 @@ export default function Searchbar() {
     // Make query to the API
     try {
       const qry_response = await api.get(qry_href);
-      // TODO: Set results in UI
+      // TODO: Various response validation before setting results
+      // TODO: Set UI to loading state for potential long response times from API
+
+      // Set state for results
+      setResult([qry_response.data.results]);
     } catch (e) {
       // TODO: handle failed query in UI
       console.error(`[ERROR] query to API failed with message: ${e}`);
@@ -97,7 +107,6 @@ export default function Searchbar() {
                   onChange={(e) => setProject(e.target.value)}
                   className="search-input"
                   value={project}
-                  onKeyDown={(e) => e.key === 13 && lineSearch()}
                 />
                 <label>Character: </label>
                 <input
