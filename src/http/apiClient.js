@@ -16,6 +16,11 @@ export const API_QRY_PARAMETERS = {
 
 // Globals for key IDs in results payload that API queries will return
 export const API_RESULT_KEYS = {
+    TOTAL_QUERY: 'total_query',
+    TOTAL_RESULTS: 'total_results',
+    MAX_QUERY: 'max_query',
+    OFFSET: 'current_offset',
+    RESULTS: 'results',
     PROJECT: 'project_name',
     CATALOGUE: 'project_catalogue',
     SEGMENT: 'project_segment',
@@ -24,6 +29,10 @@ export const API_RESULT_KEYS = {
     TIMECODE: 'timeline_values',
     FRAME_RATE: 'frame_rate',
     TICK_RATE: 'tick_rate'
+};
+
+export const API_LOCAL_DEFAULTS = {
+    MAX_QUERY: 250
 };
 
 // Axios http client instance, configured for GET requests to API line search endpoint

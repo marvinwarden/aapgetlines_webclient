@@ -3,7 +3,7 @@ import { API_QRY_URL, API_QRY_PARAMETERS} from '../http/apiClient.js';
 
 export default function buildQueryString(projects = [], episodes = [], characters = [], lines = [], pageNumber = 0 ) {
     // Control variable for adding offset to query
-    const add_offset = projects.length > 0 && episodes.length > 0 && characters.length > 0 && lines.length > 0;
+    const add_offset = projects.length > 0 || episodes.length > 0 || characters.length > 0 || lines.length > 0;
     
     // Helpers for various delimiter types;
     const comma_delimit = (p, c) => {

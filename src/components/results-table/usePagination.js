@@ -1,26 +1,24 @@
 import { useState } from "react";
+import buildQueryString from "../../utils/query-url"
+import { api, API_RESULT_KEYS } from "../../http/apiClient";
 
+export default function usePagination(searchResult) {
+    // State helpers
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
-const usePagination = (searchResult) => {
-
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  // Callback for changing a page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Callback for managing new rows per page
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(parseInt(event.target.value));
     setPage(0);
   };
 
-  const emptyRows =
-    rowsPerPage -
-    Math.min(
-      rowsPerPage,
-      searchResult.map((result) => result.length) - page * rowsPerPage
-      );
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, searchResult.map((result) => result.length) - page * rowsPerPage);
    
     return {
         page,
@@ -29,7 +27,4 @@ const usePagination = (searchResult) => {
         handleChangeRowsPerPage,
         emptyRows
     }
-    
 }
-
-export default usePagination;

@@ -5,16 +5,27 @@ import { epRangesToSequences } from "./epRange.js";
 import usePagination from "../results-table/usePagination";
 import buildQueryString from "../../utils/query-url";
 import '../../http/apiClient';
-import { api } from "../../http/apiClient";
+import { api, API_RESULT_KEYS, API_LOCAL_DEFAULTS } from "../../http/apiClient";
 
 export default function Searchbar() {
   const [project, setProject] = useState("");
   const [character, setCharacter] = useState("");
   const [episode, setEpisode] = useState("");
   const [line, setLine] = useState("");
-  const [result, setResult] = useState([]);
   
-  const { page } = usePagination(result);
+  // Create default object state for search results
+  // TODO: Set this default as a global in app
+  const [result, setResult] = useState({
+    query: '',
+    query_params: [],
+    data: {
+        [API_RESULT_KEYS.TOTAL_QUERY]:   0,
+        [API_RESULT_KEYS.TOTAL_RESULTS]: 0,
+        [API_RESULT_KEYS.MAX_QUERY]:     API_LOCAL_DEFAULTS.MAX_QUERY,
+        [API_RESULT_KEYS.OFFSET]:        0,
+        [API_RESULT_KEYS.RESULTS]:       []
+    }
+  });
   
   // data search from form input
   const lineSearch = async (e) => {
@@ -71,8 +82,15 @@ export default function Searchbar() {
       // TODO: Various response validation before setting results
       // TODO: Set UI to loading state for potential long response times from API
 
+      // Store href used for this query in data payload
+      const results = {
+          query: qry_href,
+          query_params: [list_projects, eps_sequence, list_characters, list_lines, 0],
+          data: qry_response.data
+      }
+
       // Set state for results
-      setResult([qry_response.data.results]);
+      setResult(results);
     } catch (e) {
       // TODO: handle failed query in UI
       console.error(`[ERROR] query to API failed with message: ${e}`);
@@ -149,7 +167,7 @@ export default function Searchbar() {
         </div>
       </div>
 
-      <Table searchResult={result} project={project} character={character} episode={episode} line={line} />
+      <Table searchResult={result}/>
     </div>
   );
 }
