@@ -42,17 +42,17 @@ export default function Searchbar() {
       let delimiter = '';
 
       if (k === 'episode' || k === 'character') {
-        // Handle case wher user uses | as delimiter
-        // TODO: Use better procedure for testing which delimiter is being used
-        const re_delimiter = new RegExp('|');
-
-        if (re_delimiter.test(i[k])) delimiter = '|';
-        else delimiter = ',';
-
-      } else if (k === 'project' || k === 'line') {
-        delimiter = '|';
-      }
-
+          // Handle case wher user uses | as delimiter
+          // TODO: Use better procedure for testing which delimiter is being used
+          const re_delimiter = new RegExp('\\|');
+          
+          if (re_delimiter.test(i[k])) delimiter = '|';
+          else delimiter = ',';
+          
+        } else if (k === 'project' || k === 'line') {
+            delimiter = '|';
+        }
+        
       const dirty_data = i[k].split(delimiter);
       for (const n of dirty_data) {
         i['data'].push(n.trim().toLowerCase());
