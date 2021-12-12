@@ -7,15 +7,8 @@ import buildQueryString from "../../utils/query-url";
 import '../../http/apiClient';
 import { api, API_RESULT_KEYS, API_LOCAL_DEFAULTS } from "../../http/apiClient";
 
-export default function Searchbar() {
-  const [project, setProject] = useState("");
-  const [character, setCharacter] = useState("");
-  const [episode, setEpisode] = useState("");
-  const [line, setLine] = useState("");
-  
-  // Create default object state for search results
-  // TODO: Set this default as a global in app
-  const [result, setResult] = useState({
+// Search bar defaults
+const result_default = {
     query: '',
     query_params: [],
     data: {
@@ -25,7 +18,17 @@ export default function Searchbar() {
         [API_RESULT_KEYS.OFFSET]:        0,
         [API_RESULT_KEYS.RESULTS]:       []
     }
-  });
+  };
+
+export default function Searchbar() {
+  const [project, setProject] = useState("");
+  const [character, setCharacter] = useState("");
+  const [episode, setEpisode] = useState("");
+  const [line, setLine] = useState("");
+  
+  // Create default object state for search results
+  // TODO: Set this default as a global in app
+  const [result, setResult] = useState(result_default);
   
   // data search from form input
   const lineSearch = async (e) => {
@@ -104,7 +107,7 @@ export default function Searchbar() {
 
   const clearSearch = (e) => {
     e.preventDefault();
-    setResult([]);
+    setResult(result_default);
     setCharacter("");
     setProject("");
     setLine("");
