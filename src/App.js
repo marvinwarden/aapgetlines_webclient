@@ -31,7 +31,8 @@ export default class App extends React.Component {
             line: '',
             page: 0,
             rows_per_page: 10,
-            result: result_default
+            result: result_default,
+            result_swap: result_default
         };
     }
     
@@ -41,10 +42,8 @@ export default class App extends React.Component {
     }
 
     // Callback method for preparing user search inputs and querying database
-    async lineSearch(offset = 0, reset = false) {
+    async lineSearch(offset = 0, direction = true) {
         // TODO: Validate that at least one option was provided by user
-        if (reset) this.setState();
-        
         // Storage for parsed user input
         let list_projects = [];
         let list_episodes = [];
@@ -88,16 +87,23 @@ export default class App extends React.Component {
         const eps_sequence = epRangesToSequences(list_episodes);
         
         // Build the URL based on user inputs
+        const qry_offset_swap = (offset === 0 && !direction) ? 0 : 1;
         const qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines, offset);
-        console.log('Making call to API with href:', qry_href);
+        const qry_href_swap = ((direction)
+            ? buildQueryString(list_projects, eps_sequence, list_characters, list_lines, offset + qry_offset_swap)
+            : buildQueryString(list_projects, eps_sequence, list_characters, list_lines, offset - qry_offset_swap)
+        );
         
         // Make query to the API
         try {
+            console.log('Making call to API with href:', qry_href);
             const qry_response = await api.get(qry_href);
+            console.log('Making call to API with href:', qry_href_swap);
+            const qry_swap_response = await api.get(qry_href_swap);
             // TODO: Various response validation before setting results
             // TODO: Set UI to loading state for potential long response times from API
-            
-            // Store href used for this query in data payload
+
+            // Check if data is valid and store relevant data in payload
             const qry_data = ((qry_response.status === 200)
                 ? qry_response.data
                 : result_default
@@ -108,9 +114,10 @@ export default class App extends React.Component {
                 query_params: [list_projects, eps_sequence, list_characters, list_lines, offset],
                 data: qry_response.data
             }
-            
+
             // Set state for results
             this.setState({ result: results });
+            this.setState({ result_swap: qry_swap_response });
         } catch (e) {
             // TODO: handle failed query in UI
             console.error(`[ERROR] query to API failed with message: ${e}`);
@@ -141,12 +148,6 @@ export default class App extends React.Component {
                     line={this.state.line}
                     page={this.state.page}
                 />
-                <Table
-                    page={this.state.page}
-                    rowsPerPage={this.state.rows_per_page}
-                    searchCallback={this.lineSearch.bind(this)}
-                    searchResult={this.state.result}
-                />
                 {
                     <TablePagination
                         results={this.state.result}
@@ -156,6 +157,12 @@ export default class App extends React.Component {
                         searchCallback={this.lineSearch.bind(this)}
                     />
                 }
+                <Table
+                    page={this.state.page}
+                    rowsPerPage={this.state.rows_per_page}
+                    searchCallback={this.lineSearch.bind(this)}
+                    searchResult={this.state.result}
+                />
             </div>
         );
     }

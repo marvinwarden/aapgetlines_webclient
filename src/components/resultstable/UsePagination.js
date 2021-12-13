@@ -10,11 +10,8 @@ export default function TablePagination({results, page, rowsPerPage, updatePageC
 
     // Variables for UI display
     const total_page = Math.floor(total_results / rowsPerPage);
-    const cb = async (v) => {
-
-    };
-
-    const change_page = (offset) => {
+    
+    const change_page = (offset, direction) => {
         // Handle page number
         const next_page = (page + offset <= 0) ? 0 : page + offset;
 
@@ -24,7 +21,7 @@ export default function TablePagination({results, page, rowsPerPage, updatePageC
         if (Math.floor(next_page * rowsPerPage / chunk_size) !== chunk
         || Math.floor(next_page * rowsPerPage) - (chunk * chunk_size) > chunk_size)
         {
-            searchCallback(Math.floor(next_page * rowsPerPage / chunk_size));
+            searchCallback(Math.floor(next_page * rowsPerPage / chunk_size), direction);
         }
 
         // Update state for page number
@@ -55,9 +52,9 @@ export default function TablePagination({results, page, rowsPerPage, updatePageC
         <div>
             Page {page + 1} of {total_page + 1}
             <br/>
-            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(-1); }}>Previous</ButtonBase>
+            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(-1, false); }}>Previous</ButtonBase>
             <span>    </span>
-            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(1); }}>Next</ButtonBase>
+            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(1, true); }}>Next</ButtonBase>
         </div>
     );
 }
