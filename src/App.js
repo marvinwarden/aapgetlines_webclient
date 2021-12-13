@@ -6,6 +6,7 @@ import { api, API_RESULT_KEYS, API_LOCAL_DEFAULTS } from './http/ApiClient.js';
 import Table from './components/resultstable/Table.js';
 import buildQueryString from './utils/QueryUrl.js';
 import { epRangesToSequences } from './components/searchbar/EpRange.js';
+import TablePagination from './components/resultstable/UsePagination';
 
 const result_default = {
     query: '',
@@ -28,6 +29,8 @@ export default class App extends React.Component {
             character: '',
             episode: '',
             line: '',
+            page: 0,
+            rows_per_page: 10,
             result: result_default
         };
     }
@@ -38,8 +41,9 @@ export default class App extends React.Component {
     }
 
     // Callback method for preparing user search inputs and querying database
-    async lineSearch() {
+    async lineSearch(offset = 0, reset = false) {
         // TODO: Validate that at least one option was provided by user
+        if (reset) this.setState();
         
         // Storage for parsed user input
         let list_projects = [];
@@ -59,9 +63,10 @@ export default class App extends React.Component {
         for (const i of user_input) {
             const k = Object.keys(i)[0];
             let delimiter = '';
+
             
             if (k === 'episode' || k === 'character') {
-                // Handle case wher user uses | as delimiter
+                // Handle case where user uses | as delimiter
                 // TODO: Use better procedure for testing which delimiter is being used
                 const re_delimiter = new RegExp('\\|');
                 
@@ -77,12 +82,14 @@ export default class App extends React.Component {
                 i['data'].push(n.trim().toLowerCase());
             }
         }
-        
+
         // Transform ranged episodes to a sequence of comma-seperated values
+        // TODO: Constrain max range to prevent user from generating too many numbers
         const eps_sequence = epRangesToSequences(list_episodes);
         
         // Build the URL based on user inputs
-        const qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines);
+        const qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines, offset);
+        console.log('Making call to API with href:', qry_href);
         
         // Make query to the API
         try {
@@ -91,9 +98,14 @@ export default class App extends React.Component {
             // TODO: Set UI to loading state for potential long response times from API
             
             // Store href used for this query in data payload
+            const qry_data = ((qry_response.status === 200)
+                ? qry_response.data
+                : result_default
+            );
+
             const results = {
                 query: qry_href,
-                query_params: [list_projects, eps_sequence, list_characters, list_lines, 0],
+                query_params: [list_projects, eps_sequence, list_characters, list_lines, offset],
                 data: qry_response.data
             }
             
@@ -104,17 +116,16 @@ export default class App extends React.Component {
             console.error(`[ERROR] query to API failed with message: ${e}`);
         }
         
-    };
+    }
     
     // Method for clearing search fields
-    clearSearch(e) {
-        e.preventDefault();
-        this.setResult({ result: result_default });
-        this.setResult({ project: '' });
-        this.setResult({ character: '' });
-        this.setResult({ episode: '' });
-        this.setResult({ line: '' });
-    };
+    clearSearch() {
+        this.setState({ result: result_default });
+        this.setState({ project: '' });
+        this.setState({ character: '' });
+        this.setState({ episode: '' });
+        this.setState({ line: '' });
+    }
 
     render() {    
         return (
@@ -128,8 +139,23 @@ export default class App extends React.Component {
                     character={this.state.character}
                     episode={this.state.episode}
                     line={this.state.line}
+                    page={this.state.page}
                 />
-                <Table searchResult={this.state.result}/>
+                <Table
+                    page={this.state.page}
+                    rowsPerPage={this.state.rows_per_page}
+                    searchCallback={this.lineSearch.bind(this)}
+                    searchResult={this.state.result}
+                />
+                {
+                    <TablePagination
+                        results={this.state.result}
+                        page={this.state.page}
+                        rowsPerPage={this.state.rows_per_page}
+                        updatePageCallback={this.updateFieldState.bind(this)}
+                        searchCallback={this.lineSearch.bind(this)}
+                    />
+                }
             </div>
         );
     }
