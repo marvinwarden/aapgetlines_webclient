@@ -1,5 +1,4 @@
-import { epRange } from '../components/searchbar/epRange.js'; 
-import { API_QRY_URL, API_QRY_PARAMETERS} from '../http/apiClient.js';
+import { API_QRY_URL, API_QRY_PARAMETERS} from '../http/ApiClient.js';
 
 export default function buildQueryString(projects = [], episodes = [], characters = [], lines = [], pageNumber = 0 ) {
     // Helpers for various delimiter types;

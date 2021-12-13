@@ -5,7 +5,7 @@ const NANOSECONDS = 1000000000.0;
 const N_RESOLUTION = MICROSECONDS;
 
 // TODO: Fix precision/rounding error for floats
-function float_to_tc(n, frame_rate, tick_rate) {
+export function float_to_tc(n, frame_rate, tick_rate) {
     let h = 0.0;
     let m = 0.0;
     let s = 0.0;
@@ -39,7 +39,7 @@ function float_to_tc(n, frame_rate, tick_rate) {
     return `${hs}:${ms}:${ss}:${fs}`;
 }
 
-function tc_to_float(tc, frame_rate, tick_rate) {
+export function tc_to_float(tc, frame_rate, tick_rate) {
     let h = 0.0;
     let m = 0.0;
     let s = 0.0;
@@ -54,9 +54,3 @@ function tc_to_float(tc, frame_rate, tick_rate) {
 
     return (h + m + s + f) * tick_rate;
 }
-
-// Module exports
-module.exports = {
-    float_to_tc,
-    tc_to_float
-};
