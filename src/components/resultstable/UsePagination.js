@@ -7,31 +7,34 @@ export default function TablePagination({results, page, rowsPerPage, updatePageC
     const total_results = results.data[API_RESULT_KEYS.TOTAL_QUERY];
     const chunk = results.data[API_RESULT_KEYS.OFFSET];
     const chunk_size = results.data[API_RESULT_KEYS.MAX_QUERY];
+    const query = results.qry_href;
 
     // Variables for UI display
     const total_page = Math.floor(total_results / rowsPerPage);
     
-    const change_page = (offset, direction) => {
-        // Handle page number
+    const change_page = async (offset) => {
+        // Determine what new page number should be
         const next_page = (page + offset <= 0) ? 0 : page + offset;
+        let update_page = 0;
 
-        
-        // Determine if next/previous page requires new data from API
-        // console.log('page:', page, 'next page:', next_page, 'index', Math.floor(next_page * rowsPerPage), 'chunk', chunk, 'chunk size:', chunk_size, 'chunk index', Math.floor(next_page * rowsPerPage / chunk_size));
-        if (Math.floor(next_page * rowsPerPage / chunk_size) !== chunk
-        || Math.floor(next_page * rowsPerPage) - (chunk * chunk_size) > chunk_size)
-        {
-            searchCallback(Math.floor(next_page * rowsPerPage / chunk_size), direction);
-        }
-
-        // Update state for page number
-        if (next_page <= 0) {
-            updatePageCallback(0);
+        if (next_page < 0) {
+            update_page = 0;
         } else if (next_page > total_page) {
-            updatePageCallback('page', page);
+            update_page = page;
         } else {
-            updatePageCallback('page', next_page);
+            update_page = next_page;
         }
+
+        // Determine if new data must be fetched from API
+        const new_search = Math.floor(next_page * rowsPerPage / chunk_size) !== chunk 
+                            || Math.floor(next_page * rowsPerPage) - (chunk * chunk_size) > chunk_size;
+
+        // Set new offset if new data is required
+        const new_offset = (new_search) ? Math.floor(next_page * rowsPerPage / chunk_size) : -1;
+        
+        // Invoke callbacks with new pagination parameters
+        if (new_offset > -1) await searchCallback(false, new_offset);
+        updatePageCallback('page', update_page);
     };
     // Callback for changing a page
     
@@ -52,9 +55,9 @@ export default function TablePagination({results, page, rowsPerPage, updatePageC
         <div>
             Page {page + 1} of {total_page + 1}
             <br/>
-            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(-1, false); }}>Previous</ButtonBase>
+            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(-1); }}>Previous</ButtonBase>
             <span>    </span>
-            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(1, true); }}>Next</ButtonBase>
+            <ButtonBase onClick={(e) => { e.preventDefault(); change_page(1); }}>Next</ButtonBase>
         </div>
     );
 }
