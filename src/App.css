@@ -1,16 +1,33 @@
 * {
-  font-family: Varela Round;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  color: #FFFFFF;
 }
 
 body {
-  background: repeating-linear-gradient(360deg, #6dd5ed, #2193b0, #6dd5ed);
-  height: 100%;
-  padding: 5% 5%;
+  background: none;
+  width: 100vw;
   justify-content: center;
 }
 
 .header {
-  margin-bottom: 50px;
+  margin-bottom: 25px;
   color: #fff;
-  font-size: 2rem;
+  font-size: 1.5rem;
+}
+
+.App {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  overflow: 5 5;
+  top: 0;
+  left: 0;
+  transition: background-color 1s ease-in-out;
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }

@@ -39,13 +39,44 @@ export default class App extends React.Component {
                 lines: [],
                 offset: 0
             },
-            result: result_default
+            result: result_default,
+            ui_style: {
+                backgroundColor: '#333333'
+            }
         };
     }
     
     // Callback method for components to update project property tate
     updateFieldState(key, value) {
         this.setState((s,p) => ({ [key]: value }));
+    }
+
+    async offsetPage(offset = 0) {
+        // Determine what new page number should be
+        const next_page = (this.state.page + offset <= 0) ? 0 : this.state.page + offset;
+        const total_page = Math.floor(this.state.result.data[API_RESULT_KEYS.TOTAL_QUERY] / this.state.rows_per_page);
+        let update_page = 0;
+
+        if (next_page < 0) {
+            update_page = 0;
+        } else if (next_page > total_page) {
+            update_page = this.state.page;
+        } else {
+            update_page = next_page;
+        }
+
+        // Determine if new data must be fetched from API
+        const max_query = this.state.result.data[API_RESULT_KEYS.MAX_QUERY];
+        const current_offset = this.state.result.data[API_RESULT_KEYS.OFFSET];
+        const new_search = Math.floor(next_page * this.state.rows_per_page / max_query) !== current_offset 
+                            || Math.floor(next_page * this.state.rows_per_page) - (current_offset * max_query) > max_query;
+
+        // Set new offset if new data is required
+        const new_offset = (new_search) ? Math.floor(next_page * this.state.rows_per_page / max_query) : -1;
+        
+        // Invoke callbacks with new pagination parameters
+        if (new_offset > -1) await this.lineSearch(false, new_offset);
+        this.updateFieldState('page', update_page);
     }
 
     // Callback method for preparing user search inputs and querying database
@@ -68,7 +99,15 @@ export default class App extends React.Component {
             {line: this.state.lines,           data: list_lines      }
         ]
         
-        if (new_query) {
+        // Determine if new search is valid
+        const re_space = new RegExp('^ *$');
+        const valid_search = (re_space.test(this.state.projects))
+                            && (re_space.test(this.state.characters))
+                            && (re_space.test(this.state.episodes))
+                            && (re_space.test(this.state.lines));
+
+        if (new_query && valid_search) {
+
             // Parse and seperate user options
             for (const i of user_input) {
                 const k = Object.keys(i)[0];
@@ -159,10 +198,37 @@ export default class App extends React.Component {
         });
     }
 
-    render() {    
+    componentDidMount() {
+        window.addEventListener('keydown', (e) => {
+            console.log(e.key);
+            if (e.key === 'Enter' && e.metaKey) {
+                this.lineSearch(true);
+            }
+
+            if (e.key === 'ArrowLeft' && e.metaKey) {
+                this.offsetPage(-1);
+            }
+
+            if (e.key === 'ArrowRight' && e.metaKey) {
+                this.offsetPage(1);
+            }
+
+        });
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('keydown', (e) => {
+            // TODO
+        });
+    }
+
+    componentDidUpdate(prev_props, prev_state) {
+    }
+
+    render() {
         return (
-            <div className='App'>
-                <h1 className='header'>AAP Get Lines</h1>
+            <div style={this.state.ui_style} className='App'>
+                <h1 className='header'>AAP Lore</h1>
                 <Searchbar
                     searchCallback={this.lineSearch.bind(this)}
                     clearCallback={this.clearSearch.bind(this)}
@@ -173,21 +239,21 @@ export default class App extends React.Component {
                     line={this.state.lines}
                     page={this.state.page}
                 />
-                {
-                    <TablePagination
-                        results={this.state.result}
-                        page={this.state.page}
-                        rowsPerPage={this.state.rows_per_page}
-                        updatePageCallback={this.updateFieldState.bind(this)}
-                        searchCallback={this.lineSearch.bind(this)}
-                    />
-                }
                 <Table
                     page={this.state.page}
                     rowsPerPage={this.state.rows_per_page}
                     searchCallback={this.lineSearch.bind(this)}
                     searchResult={this.state.result}
                 />
+                {
+                    <TablePagination
+                        className='pagination-bar'
+                        results={this.state.result}
+                        page={this.state.page}
+                        rowsPerPage={this.state.rows_per_page}
+                        updatePageCallback={this.offsetPage.bind(this)}
+                    />
+                }
             </div>
         );
     }

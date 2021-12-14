@@ -1,0 +1,16 @@
+.page-navigator {
+    display: block;
+    text-align: center;
+    margin: 1em 0 1em 0;
+    padding: 0 20px 0 20px;
+}
+
+.normal-text {
+    font-size: 1em;
+    font-weight: light;
+}
+
+.page-button {
+    border: 1em;
+    border-color: red;
+}

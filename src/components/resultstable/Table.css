@@ -1,16 +1,35 @@
 .table {
-  margin-top: 80px;
-  margin-bottom: 100px;
-  width: 100%;
+    width: 100%;
+    margin: 10px 0 10px 0;
+}
+
+.table-text {
+    text-align: left;
+}
+
+.table-headers {
+  font-weight: bolder;
 }
 
 table {
-  width: 100%;
-  font-size: 1rem;
+    width: 100%;
+    font-size: 1rem;
 }
 
 th,
 td {
-  padding: 10px;
-  box-shadow: 1px 1px rgb(194, 194, 194);
+    font-weight: lighter;
+    padding: 5px;
+}
+
+tr {
+  border: none;
+}
+
+tr:nth-child(odd) {
+  background-color: #333333;
+}
+
+tr:nth-child(even) {
+  background-color: #454545;
 }

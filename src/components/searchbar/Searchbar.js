@@ -10,40 +10,38 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
                             && (re_space.test(line));
 
     return (
-        <div className='search-bar search-section'>
-            <h2>Line search</h2>
+        <div className='search-bar'>
             <form className='search-form'>
-                <div className='search-fields search-input-wrapper'>
-                    <label>Project: </label>
-                    <input
-                        onChange={(e) => { e.preventDefault(); updateFieldCallback('projects', e.target.value); }}
-                        className='search-input'
-                        value={project}
-                    />
-                    <label>Character: </label>
-                    <input
-                        onChange={(e) => { e.preventDefault(); updateFieldCallback('characters', e.target.value); }}
-                        className='search-input'
-                        value={character}
-                    />
-                    <label>Episode Range: (00-00)</label>
-                    <input
-                        type='text'
-                        onChange={(e) => { e.preventDefault(); updateFieldCallback('episodes', e.target.value); }}
-                        className='search-input'
-                        value={episode}
-                    />
-                    <label>Line: </label>
-                    <input
-                        onChange={(e) => { e.preventDefault(); updateFieldCallback('lines', e.target.value); }}
-                        className='search-input'
-                        value={line}
-                    />
-                    <div className='form-btn'>
+                    <div className='input-fields'>
+                        <input
+                            placeholder='Projects'
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('projects', e.target.value); }}
+                            className='search-input'
+                            value={project}
+                        />
+                        <input
+                            placeholder='Characters'
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('characters', e.target.value); }}
+                            className='search-input'
+                            value={character}
+                        />
+                        <input
+                            placeholder='Episodes'
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('episodes', e.target.value); }}
+                            className='search-input'
+                            value={episode}
+                        />
+                        <input
+                            placeholder='Lines'
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('lines', e.target.value); }}
+                            className='search-input'
+                            value={line}
+                        />
+                    </div>
+                    {/* <div className='form-btn'>
                         <button onClick={(e) => { e.preventDefault(); if (!valid_search) searchCallback(true); }} className='search-btn'>Search</button>
                         <button onClick={(e) => { e.preventDefault(); clearCallback(); }} className='search-btn'>Reset</button>
-                    </div>
-                </div>
+                    </div> */}
             </form>
         </div>
     );

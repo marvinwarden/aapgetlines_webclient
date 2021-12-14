@@ -21,18 +21,18 @@ export default function Table({page, rowsPerPage, searchResult}) {
         // Convert timecode ticks to SMPTE frame timecode
         const tc_in = float_to_tc(found[API_RESULT_KEYS.TIMECODE][0], found[API_RESULT_KEYS.FRAME_RATE], found[API_RESULT_KEYS.TICK_RATE]);
         const tc_out = float_to_tc(found[API_RESULT_KEYS.TIMECODE][1], found[API_RESULT_KEYS.FRAME_RATE], found[API_RESULT_KEYS.TICK_RATE]);
+        const tc_length = float_to_tc((found[API_RESULT_KEYS.TIMECODE][1] - found[API_RESULT_KEYS.TIMECODE][0]), found[API_RESULT_KEYS.FRAME_RATE], found[API_RESULT_KEYS.TICK_RATE]);
         
         return (
-            <tbody>
-                <tr>
-                    <td>{found[API_RESULT_KEYS.PROJECT]}</td>
-                    <td>{found[API_RESULT_KEYS.SEGMENT]}</td>
-                    <td>{found[API_RESULT_KEYS.CHARACTER]}</td>
-                    <td>{tc_in}</td>
-                    <td>{tc_out}</td>
-                    <td>{found[API_RESULT_KEYS.LINE]}</td>
-                </tr>
-            </tbody>
+            <tr>
+                <td>{found[API_RESULT_KEYS.PROJECT]}</td>
+                <td>{found[API_RESULT_KEYS.SEGMENT]}</td>
+                <td>{found[API_RESULT_KEYS.CHARACTER]}</td>
+                <td>{tc_in}</td>
+                <td>{tc_out}</td>
+                <td>{tc_length}</td>
+                <td>{found[API_RESULT_KEYS.LINE]}</td>
+            </tr>
         );
     });
     
@@ -46,14 +46,17 @@ export default function Table({page, rowsPerPage, searchResult}) {
                         <th>Character</th>
                         <th>TC In</th>
                         <th>TC Out</th>
+                        <th>Cue Length</th>
                         <th>Line</th>
                     </tr>
                 </thead>
-                {
-                    table_data.length > 0
-                    &&
-                    table_data
-                }
+                <tbody className='table-text'>
+                    {
+                        table_data.length > 0
+                        &&
+                        table_data
+                    }
+                </tbody>
             </table>
         </div>
     );
