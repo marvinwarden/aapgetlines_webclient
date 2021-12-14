@@ -106,7 +106,7 @@ export default class App extends React.Component {
                             && (re_space.test(this.state.episodes))
                             && (re_space.test(this.state.lines));
 
-        if (new_query && valid_search) {
+        if (new_query) {
 
             // Parse and seperate user options
             for (const i of user_input) {
@@ -200,19 +200,18 @@ export default class App extends React.Component {
 
     componentDidMount() {
         window.addEventListener('keydown', (e) => {
-            console.log(e.key);
-            if (e.key === 'Enter' && e.metaKey) {
+            const modifier_key = (window.navigator.platform === 'Win32') ? e.altKey : e.metaKey;
+            if (e.key === 'Enter' && modifier_key) {
                 this.lineSearch(true);
             }
 
-            if (e.key === 'ArrowLeft' && e.metaKey) {
+            if (e.key === 'ArrowLeft' && modifier_key) {
                 this.offsetPage(-1);
             }
 
-            if (e.key === 'ArrowRight' && e.metaKey) {
+            if (e.key === 'ArrowRight' && modifier_key) {
                 this.offsetPage(1);
             }
-
         });
     }
 

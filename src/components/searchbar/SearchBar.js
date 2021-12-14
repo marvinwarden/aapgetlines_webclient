@@ -1,5 +1,5 @@
 import React from 'react';
-import './Searchbar.css';
+import './SearchBar.css';
 
 export default function Searchbar({ searchCallback, clearCallback, updateFieldCallback, project, character, episode, line }) {
     // TODO: implement input tokenization for user input during search query
