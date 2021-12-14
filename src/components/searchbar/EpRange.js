@@ -29,8 +29,8 @@ export function generateSequence(start, end) {
 */
 export function epRangesToSequences(ranges, delimiter = ':') {
     let all_sequences = [];
-    const re_range = new RegExp(`\\d+${delimiter}\\d+`, 'gi');
-    const re_digits = new RegExp('\\d+');
+    const re_range = new RegExp(`^\\d+${delimiter}\\d+$`, 'gi');
+    const re_digits = new RegExp('^\\d+$');
     
     for (const e of ranges) {
         let sequence = [];
