@@ -45,6 +45,8 @@ export default class App extends React.Component {
             }
         };
     }
+
+   
     
     // Callback method for components to update project property tate
     updateFieldState(key, value) {
@@ -81,6 +83,8 @@ export default class App extends React.Component {
 
     // Callback method for preparing user search inputs and querying database
     async lineSearch(new_query, offset = 0) {
+
+        
         // TODO: Validate that at least one option was provided by user
         // Storage for parsed user input
         let list_episodes = [];
@@ -90,7 +94,7 @@ export default class App extends React.Component {
         let eps_sequence = (new_query) ? [] : this.state.current_query_parameters.episodes;
         let qry_href = '';
         let qry_offset = (new_query) ? 0 : offset;
-        
+        console.log("app2", list_projects)
         // Collect user input from form fields
         const user_input = [
             {project: this.state.projects,     data: list_projects   },
@@ -153,6 +157,7 @@ export default class App extends React.Component {
                     offset: qry_offset
                  }
             });
+            console.log("app", this.state.current_query_parameters.projects)
         } else {
             qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines, qry_offset);
         }
@@ -237,6 +242,7 @@ export default class App extends React.Component {
                     episode={this.state.episodes}
                     line={this.state.lines}
                     page={this.state.page}
+                    currentQuery={this.setState.current_query_parameters}
                 />
                 <Table
                     page={this.state.page}

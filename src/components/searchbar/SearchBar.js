@@ -1,12 +1,14 @@
+import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 import React, { useState } from 'react';
 import './SearchBar.css';
 
-export default function Searchbar({ searchCallback, clearCallback, updateFieldCallback, project, character, episode, line }) {
+export default function Searchbar({ searchCallback, clearCallback, updateFieldCallback, project, character, episode, line, currentQuery }) {
 
     const [projectTags, setProjectTags] = useState([]);
     const [characterTags, setCharacterTags] = useState([]);
     const [episodeTags, setEpisodeTags] = useState([]);
     const [lineTags, setLineTags] = useState([]);
+
 
     // TODO: implement input tokenization for user input during search query
     const re_space = new RegExp('^ *$');
@@ -15,18 +17,37 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
         && (re_space.test(episode))
         && (re_space.test(line));
 
+    const sendQuery = (e) => {
+
+        if (e.key === window.navigator.platform === 'Win32') {
+            updateFieldCallback('current_query_parameters', {
+                projects: [...projectTags],
+                characters: [],
+                episodes: [],
+                lines: [],
+                offset: 0
+            });
+        }
+        
+    }
+
+        
     //Add tags for user query input
     const addTag = (e, tags, setTags) => {
-        if (e.key === "Enter" || e.keyCode === 13) {
+        if (e.key === "Enter") {
             if (e.target.value !== "") {
                 setTags([...tags, e.target.value]);
-                e.target.value = "";
-
+               
+            e.target.value = "";
+            } else {
+                return
             }
-            
+             
+                
         }
         
     };
+
     //Remove query tags
     const removeTag = (tagToRemove, removeTags, setRemoveTags) => {
         setRemoveTags(
@@ -36,14 +57,15 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
         );
     };
 
+    console.log(projectTags)
 
     return (
         <div className='search-bar'>
             <form className='search-form'>
                 <div className='input-fields'>
-                    <div className='tag-container'>
+                    <div className='tag-container'  >
                         {projectTags.map((tag, index) => (
-                            <p className="tags" key={index}>
+                            <p className="tags" key={index} onKeyDown={sendQuery} >
                                 {tag}
                                 <span>
                                     <i onClick={() => removeTag(index, projectTags, setProjectTags)}>x</i>
