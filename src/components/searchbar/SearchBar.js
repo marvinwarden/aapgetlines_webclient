@@ -17,20 +17,6 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
         && (re_space.test(episode))
         && (re_space.test(line));
 
-    const sendQuery = (e) => {
-
-        if (e.key === window.navigator.platform === 'Win32') {
-            updateFieldCallback('current_query_parameters', {
-                projects: [...projectTags],
-                characters: [],
-                episodes: [],
-                lines: [],
-                offset: 0
-            });
-        }
-        
-    }
-
         
     //Add tags for user query input
     const addTag = (e, tags, setTags) => {
@@ -65,7 +51,7 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
                 <div className='input-fields'>
                     <div className='tag-container'  >
                         {projectTags.map((tag, index) => (
-                            <p className="tags" key={index} onKeyDown={sendQuery} >
+                            <p className="tags" key={index}  >
                                 {tag}
                                 <span>
                                     <i onClick={() => removeTag(index, projectTags, setProjectTags)}>x</i>
@@ -76,7 +62,7 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
                         <input
 
                             placeholder='Projects'
-                            onChange={(e) => { e.preventDefault(); updateFieldCallback('projects', e.target.value); }}
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('projects', [...projectTags, e.target.value]); }}
                             onKeyDown={(e) => addTag(e, projectTags, setProjectTags)}
                             className='search-input'
                             
@@ -95,7 +81,7 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
                         <input
 
                             placeholder='Characters'
-                            onChange={(e) => { e.preventDefault(); updateFieldCallback('characters', e.target.value); }}
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('characters', [...characterTags, e.target.value]); }}
                             onKeyDown={(e) => addTag(e, characterTags, setCharacterTags)}
                             className='search-input'
                             
@@ -115,7 +101,7 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
 
                         <input
                             placeholder='Episodes'
-                            onChange={(e) => { e.preventDefault(); updateFieldCallback('episodes', e.target.value); }}
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('episodes', [...episodeTags, e.target.value]); }}
                             onKeyDown={(e) => addTag(e, setEpisodeTags)}
                             className='search-input'
                             
@@ -134,7 +120,7 @@ export default function Searchbar({ searchCallback, clearCallback, updateFieldCa
 
                         <input
                             placeholder='Lines'
-                            onChange={(e) => { e.preventDefault(); updateFieldCallback('lines', e.target.value); }}
+                            onChange={(e) => { e.preventDefault(); updateFieldCallback('lines', [...lineTags, e.target.value]); }}
                             onKeyDown={(e) => addTag(e, setLineTags)}
                             className='search-input'
                             

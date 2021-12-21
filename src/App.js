@@ -25,10 +25,12 @@ export default class App extends React.Component {
         super(props);
 
         this.state = {
-            projects: '',
-            characters: '',
-            episodes: '',
-            lines: '',
+            user_input: {
+            projects: [],
+            characters: [],
+            episodes: [],
+            lines: [],
+            },
             page: 0,
             rows_per_page: 10,
             current_query: '',
@@ -50,7 +52,8 @@ export default class App extends React.Component {
     
     // Callback method for components to update project property tate
     updateFieldState(key, value) {
-        this.setState((s,p) => ({ [key]: value }));
+        this.setState((s, p) => ({ [key]: value }));
+        console.log(this.state.projects)
     }
 
     async offsetPage(offset = 0) {
@@ -88,13 +91,13 @@ export default class App extends React.Component {
         // TODO: Validate that at least one option was provided by user
         // Storage for parsed user input
         let list_episodes = [];
-        let list_projects = (new_query) ? [] : this.state.current_query_parameters.projects;
-        let list_characters = (new_query) ? [] : this.state.current_query_parameters.characters;
+        let list_projects =  this.state.projects;
+        let list_characters = this.state.characters;
         let list_lines = (new_query) ? [] : this.state.current_query_parameters.lines;
         let eps_sequence = (new_query) ? [] : this.state.current_query_parameters.episodes;
         let qry_href = '';
         let qry_offset = (new_query) ? 0 : offset;
-        console.log("app2", list_projects)
+        
         // Collect user input from form fields
         const user_input = [
             {project: this.state.projects,     data: list_projects   },
@@ -110,57 +113,9 @@ export default class App extends React.Component {
                             && (re_space.test(this.state.episodes))
                             && (re_space.test(this.state.lines));
 
-        if (new_query) {
-
-            // Parse and seperate user options
-            for (const i of user_input) {
-                const k = Object.keys(i)[0];
-                let delimiter = '';
-    
-                
-                if (k === 'episode' || k === 'character') {
-                    // Handle case where user uses | as delimiter
-                    // TODO: Use better procedure for testing which delimiter is being used
-                    const re_delimiter = new RegExp('\\|');
-                    
-                    if (re_delimiter.test(i[k])) delimiter = '|';
-                    else delimiter = ',';
-                    
-                } else if (k === 'project' || k === 'line') {
-                    delimiter = '|';
-                }
-                
-                const dirty_data = i[k].split(delimiter);
-                for (const n of dirty_data) {
-                    i['data'].push(n.trim().toLowerCase());
-                }
-            }
-    
-            // Transform ranged episodes to a sequence of comma-seperated values
-            // TODO: Constrain max range to prevent user from generating too many numbers
-            eps_sequence = epRangesToSequences(list_episodes);
-            
-            // Build the URL based on user inputs
-            qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines, qry_offset);
-
-             // Update state for current query parameters
-             // Clear current results
-            this.setState({
-                 page: 0,
-                 results: result_default,
-                 current_query: qry_href,
-                 current_query_parameters: {
-                    projects: list_projects,
-                    episodes: eps_sequence,
-                    characters: list_characters,
-                    lines: list_lines,
-                    offset: qry_offset
-                 }
-            });
-            console.log("app", this.state.current_query_parameters.projects)
-        } else {
-            qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines, qry_offset);
-        }
+       
+        qry_href = buildQueryString(list_projects, eps_sequence, list_characters, list_lines, qry_offset);
+        
         
         // Make query to the API
         try {
